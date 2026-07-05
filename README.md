@@ -1,75 +1,129 @@
-# Discord Handler Kt
+# Discord Handler Kotlin
 
-A modern, feature-rich Discord bot handler built with Kotlin and Kord, featuring both slash commands and prefix commands with a robust modular architecture.
+A modern, feature-rich Discord bot handler built with **Kord**, featuring both slash commands and prefix commands with a robust modular architecture designed for scalability and maintainability.
 
-## Features
+## 🚀 Features
 
-- Slash commands and prefix commands
-- MongoDB integration with coroutine support
-- Modular architecture (commands, events, handlers)
-- Anti-crash system with error reporting
-- Cooldown system
-- Unicode emoji exports
-- Webhook logging
+- **Dual Command System**: Support for both slash commands and prefix commands
+- **Modular Architecture**: Clean separation of concerns with dedicated handlers
+- **Anti-Crash System**: Comprehensive error handling and monitoring
+- **Coroutine-Based**: Fully asynchronous with Kotlin coroutines
+- **Webhook Logging**: Real-time logging for errors and guild events
+- **MongoDB Integration**: Persistent data storage with mongodb-driver-kotlin-coroutine
+- **Cooldown System**: Per-command cooldown management
+- **Environment Configuration**: Secure configuration with dotenv-kotlin
 
-## Prerequisites
-
-- Java 21+
-- Gradle 8.x (or use the Gradle wrapper)
-
-## Setup
-
-1. Clone the repository
-2. Copy `.env.example` to `.env` and fill in your bot token and other configuration
-3. Run the bot:
-
-```bash
-./gradlew run
-```
-
-## Project Structure
+## 📁 Project Structure
 
 ```
-src/main/kotlin/
-├── Main.kt              # Entry point
-├── bot/
-│   └── Bot.kt           # Bot initialization and event registration
-├── config/
-│   └── Config.kt        # Configuration loader
-├── commands/
-│   ├── slash/
-│   │   └── Ping.kt      # Slash ping command
-│   └── prefix/
-│       └── Ping.kt      # Prefix ping command
-├── core/
-│   ├── CommandUtils.kt  # Cooldown utilities
-│   ├── Emojis.kt        # Unicode emoji exports
-│   └── WebhookUtil.kt   # Webhook utility
-├── database/
-│   └── Mongo.kt         # MongoDB connection
-├── events/
-│   ├── Ready.kt         # Ready event
-│   ├── GuildCreate.kt   # Guild join event
-│   ├── GuildDelete.kt   # Guild leave event
-│   ├── InteractionCreate.kt # Slash command handler
-│   └── MessageCreate.kt # Prefix command handler
-├── handlers/
-│   ├── AntiCrash.kt     # Error handling
-│   └── Logger.kt        # Startup logger
-└── models/
-    └── UserModel.kt     # User data model
+Discord-Handler-Kt/
+├── build.gradle.kts              # Gradle build configuration
+├── settings.gradle.kts           # Gradle settings
+├── gradle.properties             # Gradle properties
+├── src/                          # Source code
+│   ├── Main.kt                   # Main bot entry point
+│   ├── config/Config.kt          # Bot configuration from .env
+│   ├── bot/Bot.kt                # Bot initialization
+│   ├── Core/                     # Core utilities
+│   │   ├── CommandUtils.kt       # Cooldown and utilities
+│   │   ├── Emojis.kt             # Centralized emoji definitions
+│   │   └── WebhookUtil.kt        # Webhook utility
+│   ├── Database/
+│   │   └── Mongo.kt              # MongoDB connection setup
+│   ├── Events/                   # Discord event handlers
+│   │   ├── GuildCreate.kt        # Handler when bot joins a server
+│   │   ├── GuildDelete.kt        # Handler when bot leaves a server
+│   │   ├── InteractionCreate.kt  # Handles slash command interactions
+│   │   ├── MessageCreate.kt      # Handles prefix commands
+│   │   └── Ready.kt              # Bot ready event
+│   ├── Handlers/                 # Handlers for modularity
+│   │   ├── AntiCrash.kt          # Crash prevention and error handling
+│   │   └── Logger.kt             # Logger for bot activity
+│   ├── Models/
+│   │   └── UserModel.kt          # User data model
+│   └── Commands/
+│       ├── Prefix/               # Prefix commands
+│       │   └── Ping.kt           # Example prefix ping command
+│       └── Slash/                # Slash commands
+│           └── Ping.kt           # Example slash ping command
 ```
 
-## Adding Commands
+## 🔧 Installation
 
-### Slash Command
+1. **Clone the repository**
 
-Create a new file in `commands/slash/` following the pattern in `Ping.kt`, then register it in `Bot.kt`'s `registerSlashCommands()` method and add the handler in `events/InteractionCreate.kt`.
+   ```bash
+   git clone https://github.com/RealMtrx/Discord-Handler-Kt.git
+   cd Discord-Handler-Kt
+   ```
 
-### Prefix Command
+2. **Generate Gradle wrapper and build**
 
-Create a new file in `commands/prefix/` following the pattern in `Ping.kt`, then add it to the `prefixCommands` map in `events/MessageCreate.kt`.
+   ```bash
+   gradle wrapper
+   ./gradlew build
+   ```
 
-## License
+3. **Environment Setup**
 
-MIT License - see [LICENSE](LICENSE) for details.
+   Copy `.env.example` to `.env` and fill in your values:
+
+   ```env
+   TOKEN=your_bot_token_here
+   PREFIX=!
+   BOT_NAME=Discord Handler
+   MONGO_URI=mongodb://localhost:27017/discord-handler
+   ERROR_WEBHOOK=https://discord.com/api/webhooks/your_webhook
+   GUILD_LOG_WEBHOOK=https://discord.com/api/webhooks/your_webhook
+   ```
+
+4. **Run the bot**
+
+   ```bash
+   ./gradlew run
+   ```
+
+## 📋 Dependencies
+
+- **Kord**: v0.18.1 - Kotlin-native Discord API wrapper
+- **mongodb-driver-kotlin-coroutine**: v4.11 - MongoDB driver
+- **dotenv-kotlin**: v6.5 - Environment variable management
+- **ktor-client-cio**: v2.3 - HTTP client for webhooks
+
+## 📝 Command Development
+
+### Creating Slash Commands
+
+Create a new file in `src/Commands/Slash/[name].kt`:
+
+```kotlin
+import com.kord.core.*
+import dev.kord.common.entity.SlashCommand
+import dev.kord.core.event.InteractionCreateEvent
+
+object Ping : SlashCommand("ping", "Replies with Pong!") {
+    override suspend fun execute(event: InteractionCreateEvent) {
+        event.interaction.respond { content = "Pong! 🏓" }
+    }
+}
+```
+
+### Creating Prefix Commands
+
+Create a new file in `src/Commands/Prefix/[name].kt`:
+
+```kotlin
+import dev.kord.core.entity.Message
+
+object Ping {
+    const val name = "ping"
+
+    suspend fun execute(message: Message, args: List<String>) {
+        message.channel.createMessage("Pong! 🏓")
+    }
+}
+```
+
+---
+
+**Discord Handler** - A modern, scalable Discord bot framework built with Kotlin.

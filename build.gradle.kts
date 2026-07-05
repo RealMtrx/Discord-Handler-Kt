@@ -22,6 +22,18 @@ application {
     mainClass.set("MainKt")
 }
 
+sourceSets {
+    main {
+        kotlin {
+            setSrcDirs(listOf("src"))
+            exclude("resources")
+        }
+        resources {
+            setSrcDirs(listOf("src/resources"))
+        }
+    }
+}
+
 kotlin {
     jvmToolchain(21)
 }

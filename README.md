@@ -126,4 +126,4 @@ object Ping {
 
 ---
 
-**Discord Handler** - A modern, scalable Discord bot framework built with Kotlin.
+**Discord Handler** — Built by **Mtrx** — Discord: **0hu2**
